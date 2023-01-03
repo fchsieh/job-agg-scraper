@@ -3,8 +3,8 @@ import re
 import time
 from typing import Dict, List
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 
 
 class LinkedinScraper:
