@@ -1,8 +1,10 @@
+import datetime
 import json
 import logging
 
 from rich.logging import RichHandler
 
+from packages.db import DB
 from packages.linkedin import LinkedinScraper
 
 
@@ -11,11 +13,17 @@ class Crawler:
         self.worker = []
         # setup logger
         self.logger = logger
+        self.DB = DB()
 
     def set_search_term(self):
         # read search term from file
         config = json.load(open("config.json"))
-        search_term = config["search_term"]
+        job_title = config["search"]["job_title"]
+        job_level = config["search"]["job_level"]
+        # build search term
+        search_term = [
+            "{} {}".format(title, level) for level in job_level for title in job_title
+        ]
 
         for worker in self.worker:
             worker.set_search_term(search_term)
@@ -31,6 +39,9 @@ class Crawler:
             results.extend(worker.search())
 
         self.logger.info("Finished crawling, total {} new jobs".format(len(results)))
+        self.logger.info("Pushing data to database")
+        formatted_data = {datetime.datetime.now().strftime("%Y-%m-%d"): results}
+        self.DB.push(formatted_data)
 
 
 def setup_logger():
@@ -49,5 +60,5 @@ def setup_logger():
 if __name__ == "__main__":
     logger = setup_logger()
     app = Crawler(logger=logger)
-    app.add_worker(LinkedinScraper(logger=logger))
+    app.add_worker(LinkedinScraper())
     app.run()

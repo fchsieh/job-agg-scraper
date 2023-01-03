@@ -8,7 +8,7 @@ import requests
 
 
 class LinkedinScraper:
-    def __init__(self, logger):
+    def __init__(self):
         self.base_url = "https://www.linkedin.com/jobs/search/?keywords="
         self.search_term = []
         self.logger = logging.getLogger("LinkedIn")
@@ -26,9 +26,16 @@ class LinkedinScraper:
         job_location = card.find(
             "span", class_="job-search-card__location"
         ).text.strip()
-        job_link = card.find("a", class_="base-card__full-link")["href"]
-        date_posted = card.find("time")["datetime"]
+        job_link = card.find("a", class_="base-card__full-link").get("href", "")
+        date_posted = card.find("time").get("datetime", "")
         job_id = re.search(r"(\d+)", job_link).group(1)
+
+        # return if all fields are not empty
+        if not all(
+            [job_title, company_name, job_location, job_link, date_posted, job_id]
+        ):
+            self.logger.info("Missing fields, skipping")
+            return None
 
         return {
             "job_title": job_title,
@@ -37,6 +44,7 @@ class LinkedinScraper:
             "job_link": job_link,
             "date_posted": date_posted,
             "job_id": job_id,
+            "source": "LinkedIn",
         }
 
     def search(self):
@@ -49,10 +57,16 @@ class LinkedinScraper:
             )
             resp = requests.get(url)
             soup = BeautifulSoup(resp.text, "html.parser")
-            for card in soup.find("ul", class_="jobs-search__results-list").find_all(
-                "li"
-            ):
-                res.append(self.parse_card(card))
+            try:
+                for card in soup.find(
+                    "ul", class_="jobs-search__results-list"
+                ).find_all("li"):
+                    parsed_card = self.parse_card(card)
+                    if parsed_card is not None:
+                        res.append(parsed_card)
+            except AttributeError:
+                self.logger.info("No new jobs found for '{}'".format(term))
+                continue
 
             self.logger.info(
                 "Finished searching for '{}', total {} new jobs".format(term, len(res))
