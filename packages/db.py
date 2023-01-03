@@ -10,18 +10,21 @@ from firebase_admin import credentials, firestore
 
 
 class DB:
-    def __init__(self):
+    def __init__(self, config):
         self.db = None
+        self.config = config
         self.logger = logging.getLogger("Database")
         self.init_db()
 
     def init_db(self):
         if not firebase_admin._apps:
             path = os.path.join(os.path.dirname(__file__), "firebase.json")
+            # check if file exists
+            if not os.path.exists(path):
+                self.logger.error("Firebase {} config file not found".format(path))
+                exit(1)
             cred = credentials.Certificate(path)
-            firebase_admin.initialize_app(
-                cred, {"databaseURL": "https://job-scraper-6454d.firebaseio.com"}
-            )
+            firebase_admin.initialize_app(cred, {"databaseURL": self.config["url"]})
 
         self.db = firestore.client().collection("data")
         # check if connected

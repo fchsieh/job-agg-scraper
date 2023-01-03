@@ -11,15 +11,15 @@ from packages.linkedin import LinkedinScraper
 class Crawler:
     def __init__(self, logger):
         self.worker = []
+        self.config = json.load(open("config.json"))
         # setup logger
         self.logger = logger
-        self.DB = DB()
+        self.DB = DB(self.config["database"])
 
     def set_search_term(self):
         # read search term from file
-        config = json.load(open("config.json"))
-        job_title = config["search"]["job_title"]
-        job_level = config["search"]["job_level"]
+        job_title = self.config["search"]["job_title"]
+        job_level = self.config["search"]["job_level"]
         # build search term
         search_term = [
             "{} {}".format(title, level) for level in job_level for title in job_title
