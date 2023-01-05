@@ -1,13 +1,10 @@
-import datetime
-import os
 import logging
+import os
 
 import toml
-
-from rich.logging import RichHandler
-
 from packages.db import DB
 from packages.linkedin import LinkedinScraper
+from rich.logging import RichHandler
 
 
 class Crawler:

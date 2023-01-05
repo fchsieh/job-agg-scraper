@@ -1,9 +1,0 @@
-{
-    "database": {
-        "url": "https://job-scraper-6454d.firebaseio.com"
-    },
-    "search": {
-        "job_title": ["Software Engineer", "Backend Engineer"],
-        "job_level": ["Entry Level", "New Grad"]
-    }
-}
