@@ -1,6 +1,8 @@
 import datetime
-import json
+import os
 import logging
+
+import toml
 
 from rich.logging import RichHandler
 
@@ -11,10 +13,10 @@ from packages.linkedin import LinkedinScraper
 class Crawler:
     def __init__(self, logger):
         self.worker = []
-        self.config = json.load(open("config.json"))
+        self.config = toml.load(os.path.join("..", "config.toml"))
         # setup logger
         self.logger = logger
-        self.DB = DB(self.config["database"])
+        self.DB = DB(self.config["firebase"])
 
     def set_search_term(self):
         # read search term from file
@@ -40,7 +42,12 @@ class Crawler:
 
         self.logger.info("Finished crawling, total {} new jobs".format(len(results)))
         self.logger.info("Pushing data to database")
-        formatted_data = {datetime.datetime.now().strftime("%Y-%m-%d"): results}
+
+        date = [res["date_posted"] for res in results]
+        formatted_data = {
+            d: [res for res in results if res["date_posted"] == d] for d in set(date)
+        }
+
         self.DB.push(formatted_data)
 
 
