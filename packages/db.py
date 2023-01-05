@@ -38,7 +38,10 @@ class DB:
         for key, value in data.items():
             try:
                 self.db.document(key).set({"jobs": value})
-                self.logger.info("Pushed data to database")
             except Exception as e:
                 self.logger.error("Error pushing data to database: {}".format(e))
                 return False
+            finally:
+                self.logger.info(
+                    "Pushed {} jobs to database for {}".format(len(value), key)
+                )
