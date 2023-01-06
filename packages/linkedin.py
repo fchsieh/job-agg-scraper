@@ -8,13 +8,18 @@ from bs4 import BeautifulSoup
 
 
 class LinkedinScraper:
-    def __init__(self):
+    def __init__(self, kwmap: Dict[str, str]):
         self.base_url = "https://www.linkedin.com/jobs/search/?keywords="
+        self.keywords = kwmap.values()
         self.search_term = []
         self.logger = logging.getLogger("LinkedIn")
         self.search_time = {
             "24h": "&f_TPR=r86400",
         }
+        if len(self.keywords) > 0:
+            # flatten list
+            self.keywords = [item for sublist in self.keywords for item in sublist]
+        print(self.keywords)
 
     def set_search_term(self, search_term: List[str]):
         self.search_term.extend(search_term)
@@ -37,6 +42,12 @@ class LinkedinScraper:
             self.logger.info("Missing fields, skipping")
             return None
 
+        # parse tags
+        keywords = []
+        for term in self.keywords:
+            if term.lower() in job_title.lower():
+                keywords.append(term)
+
         return {
             "job_title": job_title,
             "company_name": company_name,
@@ -45,6 +56,7 @@ class LinkedinScraper:
             "date_posted": date_posted,
             "job_id": job_id,
             "source": "LinkedIn",
+            "keywords": keywords,
         }
 
     def search(self):

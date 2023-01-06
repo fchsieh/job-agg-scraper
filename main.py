@@ -64,5 +64,5 @@ def setup_logger():
 if __name__ == "__main__":
     logger = setup_logger()
     app = Crawler(logger=logger)
-    app.add_worker(LinkedinScraper())
+    app.add_worker(LinkedinScraper(kwmap=app.config["search"]))
     app.run()
