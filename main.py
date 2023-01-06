@@ -13,7 +13,7 @@ class Crawler:
         self.config = toml.load(os.path.join("..", "config.toml"))
         # setup logger
         self.logger = logger
-        self.DB = DB(self.config["firebase"])
+        self.DB = DB(config=self.config)
 
     def set_search_term(self):
         # read search term from file

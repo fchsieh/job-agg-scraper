@@ -18,15 +18,17 @@ class DB:
 
     def init_db(self):
         if not firebase_admin._apps:
-            path = os.path.join("..", self.config["config"])
+            path = os.path.join("..", self.config["firebase"]["credentials"])
             # check if file exists
             if not os.path.exists(path):
                 self.logger.error("Firebase {} config file not found".format(path))
                 exit(1)
             cred = credentials.Certificate(path)
-            firebase_admin.initialize_app(cred, {"databaseURL": self.config["url"]})
+            firebase_admin.initialize_app(
+                cred, {"databaseURL": self.config["firebase"]["url"]}
+            )
 
-        self.db = firestore.client().collection(self.config["collection"])
+        self.db = firestore.client().collection(self.config["database"]["collection"])
         # check if connected
         if self.db:
             self.logger.info("Connected to firebase database")
@@ -37,7 +39,7 @@ class DB:
     def push(self, data):
         for key, value in data.items():
             try:
-                self.db.document(key).set({"jobs": value})
+                self.db.document(key).set({self.config["database"]["document"]: value})
             except Exception as e:
                 self.logger.error("Error pushing data to database: {}".format(e))
                 return False
