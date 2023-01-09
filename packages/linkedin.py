@@ -19,7 +19,6 @@ class LinkedinScraper:
         if len(self.keywords) > 0:
             # flatten list
             self.keywords = [item for sublist in self.keywords for item in sublist]
-        print(self.keywords)
 
     def set_search_term(self, search_term: List[str]):
         self.search_term.extend(search_term)
