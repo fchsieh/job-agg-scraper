@@ -2,9 +2,11 @@ import logging
 import os
 
 import toml
-from packages.db import DB
-from packages.linkedin import LinkedinScraper
 from rich.logging import RichHandler
+
+from packages.db import DB
+from packages.indeed import IndeedScraper
+from packages.linkedin import LinkedinScraper
 
 
 class Crawler:
@@ -44,7 +46,6 @@ class Crawler:
         formatted_data = {
             d: [res for res in results if res["date_posted"] == d] for d in set(date)
         }
-
         self.DB.push(formatted_data)
 
 
@@ -52,12 +53,11 @@ def setup_logger():
     # setup logger
     logger = logging.getLogger()
     logging.basicConfig(
-        level="DEBUG",
         format="%(message)s",
         datefmt="[%X]",
         handlers=[RichHandler(rich_tracebacks=True)],
     )
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     return logger
 
 
@@ -65,4 +65,5 @@ if __name__ == "__main__":
     logger = setup_logger()
     app = Crawler(logger=logger)
     app.add_worker(LinkedinScraper(kwmap=app.config["search"]))
+    app.add_worker(IndeedScraper(kwmap=app.config["search"]))
     app.run()

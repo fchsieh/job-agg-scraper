@@ -59,6 +59,7 @@ class LinkedinScraper:
         }
 
     def search(self):
+        self.logger.info("Starting LinkedIn search")
         res = []
 
         for term in self.search_term:

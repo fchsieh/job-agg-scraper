@@ -1,7 +1,6 @@
-# LinkedIn Scraper
+# Job Scraper
 
-Scrapper for LinkedIn jobs.
-Will push to firebase.
+Scraper for LinkedIn and Indeed jobs.
 
 -   Usage
 
