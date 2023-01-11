@@ -49,6 +49,8 @@ class IndeedScraper:
     def parse_card(self, card) -> Dict[str, str]:
         job_title = card.find("h2").getText()
         parsed_job_url = card.select_one("h2 a")["href"].replace("/rc/clk?", "viewjob?")
+        if parsed_job_url.startswith("/"):
+            parsed_job_url = parsed_job_url[1:]  # remove leading slash
         job_link = "https://www.indeed.com/" + parsed_job_url
         company_name = card.find(attrs={"class": "companyName"}).getText()
         job_location = card.find(attrs={"class": "companyLocation"}).getText()
