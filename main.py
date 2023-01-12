@@ -39,13 +39,19 @@ class Crawler:
         for worker in self.worker:
             results.extend(worker.search())
 
-        self.logger.info("Finished crawling, total {} new jobs".format(len(results)))
+        self.logger.info(
+            "Finished crawling, total {} new jobs before filtering".format(len(results))
+        )
         self.logger.info("Pushing data to database")
 
         date = [res["date_posted"] for res in results]
         formatted_data = {
             d: [res for res in results if res["date_posted"] == d] for d in set(date)
         }
+        # remove duplicates by job_id
+        for date, data in formatted_data.items():
+            formatted_data[date] = list({v["job_id"]: v for v in data}.values())
+
         self.DB.push(formatted_data)
 
 

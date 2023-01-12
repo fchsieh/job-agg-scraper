@@ -32,7 +32,9 @@ class LinkedinScraper:
         ).text.strip()
         job_link = card.find("a", class_="base-card__full-link").get("href", "")
         date_posted = card.find("time").get("datetime", "")
-        job_id = hashlib.md5(job_link.encode()).hexdigest()
+        job_id = hashlib.md5(
+            f"{job_title}{company_name}{job_location}{date_posted}".lower().encode()
+        ).hexdigest()
 
         # return if all fields are not empty
         if not all(

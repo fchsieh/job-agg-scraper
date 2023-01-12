@@ -56,7 +56,6 @@ class IndeedScraper:
         job_location = card.find(attrs={"class": "companyLocation"}).getText()
         # remove postal code
         job_location = re.sub(r"\d{5}", "", job_location).strip()
-        job_id = hashlib.md5(job_link.encode()).hexdigest()
         # parse date posted
         date_posted = card.find(attrs={"class": "date"}).getText()
         if "Today" in date_posted or "Just" in date_posted:
@@ -75,6 +74,9 @@ class IndeedScraper:
         else:
             # otherwise, use today's date
             date_posted = date.today().strftime("%Y-%m-%d")
+        job_id = hashlib.md5(
+            f"{job_title}{company_name}{job_location}{date_posted}".lower().encode()
+        ).hexdigest()
 
         # return if all fields are not empty
         if not all(
