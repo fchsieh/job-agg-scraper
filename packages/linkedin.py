@@ -1,5 +1,5 @@
+import hashlib
 import logging
-import re
 import time
 from typing import Dict, List
 
@@ -32,7 +32,7 @@ class LinkedinScraper:
         ).text.strip()
         job_link = card.find("a", class_="base-card__full-link").get("href", "")
         date_posted = card.find("time").get("datetime", "")
-        job_id = re.search(r"(\d+)", job_link).group(1)
+        job_id = hashlib.md5(job_link.encode()).hexdigest()
 
         # return if all fields are not empty
         if not all(
